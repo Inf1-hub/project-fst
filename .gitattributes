@@ -1,0 +1,12 @@
+* text=auto
+*.gd text eol=lf
+*.godot text eol=lf
+*.tscn text eol=lf
+*.tres text eol=lf
+*.csv text eol=lf
+*.ps1 text eol=crlf
+*.png binary
+*.ogg binary
+*.wav binary
+*.blend binary
+

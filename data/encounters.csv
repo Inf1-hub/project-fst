@@ -1,0 +1,5 @@
+id,name,x,y,units,loot
+south,废壕守军,850,1580,"[""soldier"", ""soldier"", ""soldier"", ""archer""]",1
+west,断墙巡队,430,1120,"[""soldier"", ""soldier"", ""archer"", ""horn""]",1
+east,庭院卫队,1280,800,"[""soldier"", ""soldier"", ""soldier"", ""archer"", ""archer""]",1
+captain,裂城百夫长,900,430,"[""boss""]",1

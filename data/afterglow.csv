@@ -1,0 +1,7 @@
+id,name,color,grade,description,ability,operation,field,value,effects
+shock,器辉 · 盾墙回响,gold,聚光,盾击额外造成一段伤害，强化近身压制。,shield_bash,append,,0,"[{""system"": ""damage"", ""amount"": 20}]"
+frost,器辉 · 霜沿,cyan,折光,挥斩附带 2 秒减速，便于追击与脱身。,slash,append,,0,"[{""system"": ""slow"", ""duration"": 2, ""factor"": 0.65}]"
+reach,器辉 · 震荡,gold,聚光,盾击半径扩大至 200，可同时压制一簇敌人。,shield_bash,override,radius,200,[]
+blood,固辉 · 归息,green,折光,每次挥斩命中后回复 2 点生命。,slash,append,,0,"[{""system"": ""heal"", ""amount"": 2, ""recipient"": ""source""}]"
+echo,器辉 · 反击余韵,white,神余,反击斩增加 45 点伤害，并眩晕命中的敌人。,counter,append,,0,"[{""system"": ""damage"", ""amount"": 45}, {""system"": ""stun"", ""duration"": 0.7}]"
+swift,固辉 · 追风,cyan,折光,施放盾击时获得 2 秒加速，无需命中。,shield_bash,append,,0,"[{""system"": ""haste"", ""duration"": 2, ""factor"": 1.3, ""recipient"": ""source""}]"

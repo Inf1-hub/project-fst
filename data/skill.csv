@@ -1,0 +1,7 @@
+id,name,key,cooldown,radius,arc,target,requires,effects
+slash,挥斩,LMB,0.4,105,0.1,enemy,,"[{""system"": ""damage"", ""amount"": 25}]"
+shield_bash,盾击,Q,4,125,0.15,enemy,,"[{""system"": ""damage"", ""amount"": 34}, {""system"": ""stun"", ""duration"": 1}]"
+counter,反击斩,E,1.5,175,-0.3,enemy,counter,"[{""system"": ""damage"", ""amount"": 82}]"
+taunt,挑衅踏,R,8,310,-1,enemy,,"[{""system"": ""taunt"", ""duration"": 3}, {""system"": ""slow"", ""duration"": 3, ""factor"": 0.5}]"
+bulwark,壁垒,F,12,0,-1,self,,"[{""system"": ""guard"", ""duration"": 4, ""factor"": 0.55}, {""system"": ""heal"", ""amount"": 18}]"
+rally,集结号角,C,16,0,-1,self,,"[{""system"": ""haste"", ""duration"": 4, ""factor"": 1.25}, {""system"": ""heal"", ""amount"": 22}]"

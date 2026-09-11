@@ -1,0 +1,4 @@
+id,name,max_fps,fx_cap,decoration,shadows
+low,低 · 性能,60,24,0,0
+medium,中 · 均衡,60,64,1,1
+high,高 · 精细,120,128,2,1

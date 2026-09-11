@@ -1,0 +1,49 @@
+# Godot 本地缓存与导入产物
+.godot/
+.import/
+
+# 本机日志、捕获图、临时脚本
+.local/
+build/
+android/
+
+# 验证截图：可由 tests/visual_capture.gd 重新生成，非运行必需
+docs/screenshots/
+
+# 源稿与方向参考大图：不进运行时，JSON 清单仍纳入版本控制
+source_assets/art_drafts/
+source_assets/*.png
+source_assets/*.jpg
+source_assets/*.jpeg
+source_assets/*.webp
+
+# 离线源文件与编辑器备份
+*.blend
+*.blend1
+*.blend2
+*.psd
+*.kra
+*.xcf
+*.fbx
+*.exr
+*.hdr
+
+# 导出产物与凭据
+export_credentials.cfg
+*.pck
+*.exe
+
+# Python 工具缓存
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# 系统与编辑器杂项
+.DS_Store
+Thumbs.db
+desktop.ini
+*.tmp
+*.swp
+.idea/
+.vs/

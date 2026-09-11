@@ -1,0 +1,17 @@
+{
+  "method": "builtin image_gen",
+  "prompts": [
+    [
+      "rubble_bank_v3",
+      "Game environment sprite with transparent background, true RGBA alpha. One long low irregular mound of collapsed pale limestone masonry, weathered angular blocks partially buried in grey-brown earth, sparse dry grass and moss, one broken carved pillar piece, no standing intact wall. Grounded medieval ruined battlefield. Isometric view from above at 50 degrees, orthographic, realistic muted cold-gray hand-painted illustration, soft overcast top-left lighting, fine painterly textures, not cartoon. Wide 3:1 subject fills frame with fully visible irregular feathered debris edges. NO backdrop, NO checkerboard, NO landscape, NO sky, NO text. Asset intended to blend into matching stony ground."
+    ],
+    [
+      "field_barricade_v3",
+      "Transparent background RGBA isolated game sprite of a ruined medieval timber battlefield barricade. Broad horizontal row of uneven weathered sharpened wooden stakes, two splintered beams, a small torn desaturated dark burgundy banner with no markings, some grey stones and dry grass along base. Isometric orthographic top-down 50 degree view, realistic cold-gray hand-painted medieval game environment illustration, subdued light from upper-left. Entire object visible with irregular outline, wide 2:1 canvas. No backdrop or checkerboard, no humans, no sky, no text. Timber grey brown not orange. Ground contact silhouette rather than a floating platform."
+    ],
+    [
+      "abandoned_camp_v3",
+      "Transparent RGBA background environment sprite: a compact abandoned medieval soldier camp prop cluster, one collapsed dark grey canvas lean-to tent, two weathered barrels, broken wooden cart wheel, small pile of pale limestone rubble, a furled dark burgundy cloth. Isometric orthographic 50 degree overhead view, realistic muted cool-gray hand-painted medieval battlefield illustration with matte surfaces and upper-left soft overcast light. Whole cluster fully visible, 3:2 composition, no square base or flooring slab, natural irregular scattered silhouette. No backdrop, no checkerboard, no sky, no people, no text."
+    ]
+  ]
+}

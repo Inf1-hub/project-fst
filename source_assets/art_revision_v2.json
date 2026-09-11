@@ -1,0 +1,49 @@
+{
+  "reference": "art_direction_a.png",
+  "method": "builtin image_gen",
+  "notes": "Reference-guided modular courtyard revision. Rejected opaque checkerboard drafts are not used.",
+  "prompts": [
+    [
+      [
+        "courtyard_ground_v2",
+        "Use the attached reference as strict style reference, not as a compositional image to reproduce. Create a reusable seamless square ground texture for that exact game scene. Overhead orthographic painted ground only: SMALL broken irregular pale grey courtyard cobbles, compact dust and gritty rubble, subtle olive moss in crevices. There should be approximately 35 to 45 small stones across the image width; NOT huge flagstones. Matching the reference's soft ash grey midtones, painterly brush edges, muted cold daylight, low contrast, rich natural unevenness. Edge to edge flat ground texture, no shadows from external objects, no walls, no characters, no circular patterns, no UI, no borders. 2D painted game texture. Completely flat lighting so repeated tiles are invisible."
+      ],
+      [
+        "fortress_gate_v2",
+        "Use the attached reference as strict visual style and lighting reference. Generate ONE production 2D environment sprite, isolated on a genuinely transparent background: a massive ruined medieval WHITE-GREY limestone fortress gate facade, horizontal, an open central passage framed by high broken towers, dark iron gate doors open to the sides, two long weathered dark wine-red banners, fractured edges and scattered stone at feet, small wooden spikes near sides. Exactly the cold grey painterly quality, realistic scale, weathered stone brushwork, fixed elevated 55-degree orthographic game camera of the attached image. We see the front and upper surfaces; facade front edge runs horizontally, NOT a diamond/isometric tile. Gate width 3 times its height. No ground plane extending outside the footprint, no background mountains or sky, no people or creatures, no UI, no text, no giant decorative gold. Sprite alone, centered fully inside frame with 4% padding. Preserve richly detailed rubble and torn cloth."
+      ],
+      [
+        "perimeter_ruins_v2",
+        "Use the attached image as a STRICT style and projection reference. Create ONE reusable tall vertical 2D environment border sprite isolated on genuinely transparent background: the LEFT edge of a ruined medieval castle courtyard seen from the same elevated fixed oblique camera. Tall broken cold ash-grey limestone battlements, repeated piers and gothic wall fragments, faded dark burgundy hanging banners, old timber spikes, a broken cart wheel, two barrels, torn grey canvas and fallen stone clustered at the foot on the RIGHT / inward-facing side. An irregular medieval silhouette with fine painterly detail matching the reference. Long vertical strip, about 1:2 aspect ratio. The wall runs from top toward bottom of the image, the accessible courtyard would be to its RIGHT, but do NOT draw the courtyard. Do not draw a square slab or a tile base. No people, no monsters, no sky, no text, no UI. Everything fully inside frame with narrow clear padding. Light from upper left, soft baked contact shading within objects."
+      ],
+      [
+        "distant_ruins_v2",
+        "Use the attached image as strict art reference. Paint ONLY its distant background landscape layer as a wide 16:9 game backdrop: cold misty western medieval mountain valleys, ruined white-grey castles far away, jagged cliffs fading into layered blue grey fog, pale sickly muted gold false sun through cloud in upper right. Hand-painted realistic illustrative 2D look with the exact restrained grey and old gold palette of the reference. No foreground courtyard, no characters, no UI, no text, no modern objects. Distant atmosphere only, low contrast and softer detail than foreground game assets."
+      ]
+    ],
+    [
+      [
+        "knight_back_v2",
+        "Use the attached reference as STRICT style, camera and character design reference. Create a single game sprite of its small PLAYER knight near the lower center, now isolated and larger for production: full body seen FROM BEHIND from the same elevated 55-degree orthographic camera, facing upper-right into the battlefield. Worn ash-grey medieval plate, closed helmet, dark grey short travel cape, sword held in right hand, round shield on left. Human grounded proportions, compact silhouette. Soft cold grey HAND PAINTED edges and restrained painterly brush strokes exactly like the reference, not a glossy 3D render or product photo. Complete feet and weapons inside frame, genuinely transparent background, no ground or cast shadow, no text, no UI, one character. Clear silhouette at small game scale."
+      ],
+      [
+        "captain_v2",
+        "Use the attached reference as STRICT style, camera and design reference. Isolate and recreate its large enemy captain standing by the distant gate, as one full body 2D game sprite: imposing armored western medieval commander, battered blackened plate with restrained aged bronze trim, dark burgundy torn cape, tall narrow helmet with tiny sick-gold eye slit, heavy sword and large dark kite shield. Same high oblique 55-degree fixed camera, facing lower-left toward the player. Grounded silhouette with long arms, not a squat cartoon. Painterly realistic cold grey hand-painted texture and soft edges like the image, no glossy photorealistic PBR. Genuinely transparent background; no ground, no shadow outside body, no UI or text. Entire feet, cloak and weapons inside frame. One character only."
+      ]
+    ],
+    [
+      [
+        "gate_cutout",
+        "A transparent PNG game environment sprite. ONE medieval castle gate facade, isolated on transparent background. Huge ruined ash-grey limestone twin towers flanking an open arched central passage with open iron gate doors, torn DARK BURGUNDY hanging banners, subtle ivy and rubble. Full facade viewed from elevated 55-degree fixed orthographic game camera, front edge horizontal. Hand-painted realistic illustration, cold overcast daylight, matte subtle brush textures, pale grey stone with slate shadows, grounded western medieval proportions. No people. Landscape composition, full object visible with tight padding. Real transparent background, RGBA alpha channel; background completely empty, including the opening through the arch and spaces between the gate bars. Only the gate asset."
+      ],
+      [
+        "perimeter_cutout",
+        "A transparent PNG game environment sprite. ONE tall vertical strip of ruined medieval castle rampart, viewed from elevated 55-degree orthographic camera, wall runs from top to bottom, accessible courtyard would lie to the RIGHT. Isolated on transparent background. Pale ash-grey broken limestone wall, tall gothic piers and open ruined windows, torn DARK BURGUNDY banners, ivy, fallen stones, wooden barricades, a broken cart wheel and barrels clustered along inward right-hand foot of wall. Hand-painted realistic medieval game illustration, cold overcast daylight, matte visible brush textures, muted slate shadows and dirty pale stone. Entire long wall visible, tight crop around full object. No people, no ground plane, no skyline. Transparent background with RGBA alpha channel, only isolated sprite."
+      ],
+      [
+        "knight_back_cutout",
+        "Transparent PNG sprite of ONE medieval sword and shield knight, full body FROM BEHIND facing upper right. Elevated 55-degree orthographic action RPG game camera. Worn pale grey plate armor, closed helmet, short dark grey frayed cloak, sword extended in right hand, round shield at left. Natural human proportions, grounded western medieval design. Matte hand-painted realistic illustration, soft painterly edges, cold overcast light, subdued gray highlights, no glossy render. Entire body feet and weapons visible inside frame, tight padding, isolated on empty transparent background with RGBA alpha channel. No ground or shadow, no text. A production game sprite."
+      ]
+    ]
+  ]
+}

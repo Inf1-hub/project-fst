@@ -1,0 +1,40 @@
+{
+  "description": "Three combat spaces connected by two bent main links and two flank loops. CSV is runtime authority.",
+  "configurations": [
+    [
+      "camp",
+      "破营侧道",
+      2500,
+      500,
+      2500
+    ],
+    [
+      "sidecourt",
+      "折院迂回",
+      850,
+      2850,
+      900
+    ],
+    [
+      "passage",
+      "断墙长廊",
+      2300,
+      550,
+      2300
+    ],
+    [
+      "muster",
+      "废营纵深",
+      2700,
+      600,
+      2500
+    ],
+    [
+      "captain_court",
+      "主将前庭",
+      700,
+      2850,
+      900
+    ]
+  ]
+}

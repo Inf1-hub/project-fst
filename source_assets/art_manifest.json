@@ -1,0 +1,37 @@
+{
+  "selected_direction": "A：冷灰写实手绘",
+  "runtime_assets": [
+    "actors/player/knight.png",
+    "actors/monsters/soldier.png",
+    "actors/monsters/archer.png",
+    "content/ruins/limestone_ground.png",
+    "content/ruins/ruined_wall.png"
+  ],
+  "assets": [
+    {
+      "id": "ground",
+      "prompt": "Create a square seamless tileable hand painted 2D game ground texture seen directly from overhead, cold desaturated grey ancient limestone courtyard paving, irregular large worn flagstones, subtle moss in gaps, restrained painterly realistic brush texture, low contrast to leave enemies readable. Original western medieval battlefield. Edge to edge flat even ambient light. No walls, no props, no characters, no shadows of objects, no perspective, no text. Tile should cover about 8 meters in game, not tiny repetitive cobbles. A cold gray painterly realism art direction. This is production game floor texture.",
+      "tool": "built-in image_gen"
+    },
+    {
+      "id": "knight",
+      "prompt": "Create a single full body 2D game sprite of a human sword and round shield adventurer, original western medieval worn plate armor, muted teal short cape, pale gray steel helmet, small ivory highlights. Hand painted realistic illustration in cold desaturated grey palette, grounded sturdy proportions, slight visible brush strokes. View from an elevated fixed top down oblique camera about 55 degrees, facing toward bottom right, entire body feet sword shield visible. Isolated centered on genuinely transparent background. No ground, no cast shadow, no environment, no text, no border. Character occupies 80% height. Clean silhouette at 90 pixels high. One character only.",
+      "tool": "built-in image_gen"
+    },
+    {
+      "id": "soldier",
+      "prompt": "Create a single full body 2D game sprite of a corrupted western medieval infantry soldier with short sword and battered shield, dull old gray plate armor, dark crimson ragged tabard, tiny sick gold eyes in helmet. Hand painted realistic illustration cold desaturated grey palette, subtle brush texture, grounded sturdy proportions. Elevated fixed top down oblique camera about 55 degrees, facing bottom left, entire body feet weapons visible. Isolated centered on genuinely transparent background. No ground, no cast shadow, no environment, no text, no border. Character occupies 80% height. Readable at 85 pixels high. One character only.",
+      "tool": "built-in image_gen"
+    },
+    {
+      "id": "archer",
+      "prompt": "Create a single full body 2D game sprite of a corrupted western medieval archer with a longbow, dull gray chainmail hood and ragged muted crimson cloth, tiny sick gold eyes. Hand painted realistic illustration cold desaturated grey palette, restrained brush texture, grounded proportions. Elevated fixed top down oblique camera about 55 degrees, facing bottom left, entire body feet bow visible. Isolated centered on genuinely transparent background. No ground, no cast shadow, no environment, no text, no border. Character occupies 80% height. Readable at 85 pixels high. One character only.",
+      "tool": "built-in image_gen"
+    },
+    {
+      "id": "wall",
+      "prompt": "Create one reusable 2D game environment sprite: a low ruined medieval grey limestone wall segment, horizontal length, 6 rough stone blocks wide and 2-3 courses high, some irregular broken tops, tiny dark moss, cold desaturated hand-painted realistic illustration. Elevated 55 degree top down oblique orthographic view with visible upper surfaces, front face vertically below top face, horizontal front edge parallel to image bottom, no vanishing point. Whole wall isolated centered on genuinely transparent background. No ground plane, no cast shadow outside wall, no characters, no vegetation clusters, no text. Wide landscape image, wall occupies 85% image width, 45% image height. Suitable reusable collision obstacle for a 2D action RPG. Match muted cold grey medieval game sprite art with brush textured stone, no photorealistic PBR.",
+      "tool": "built-in image_gen"
+    }
+  ]
+}
