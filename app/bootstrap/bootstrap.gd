@@ -119,6 +119,7 @@ func load_floor(preserve: bool) -> void:
 	portal_open = false
 	fx.clear()
 	projectiles.clear()
+	room.theme = data.themes.get(str(data.rooms[stage_number - 1].id), {})
 	room.configure(data.rooms[stage_number - 1])
 	boss = null
 	add_fortress_dressing()

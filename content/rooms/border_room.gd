@@ -20,6 +20,19 @@ var sight_screens: Array = []
 var supplies: Array[Vector2] = []
 var zones: Array = []
 var branches: Array = []
+var theme: Dictionary = {}
+
+
+func theme_vec3(key: String, fallback: Vector3) -> Vector3:
+	if theme.has(key) and theme[key] is Array and theme[key].size() >= 3:
+		var a: Array = theme[key]
+		return Vector3(a[0], a[1], a[2])
+	return fallback
+
+
+func theme_color(key: String, fallback: Color) -> Color:
+	var v := theme_vec3(key, Vector3(fallback.r, fallback.g, fallback.b))
+	return Color(v.x, v.y, v.z)
 
 
 func _ready() -> void:
@@ -48,6 +61,9 @@ func configure(layout: Dictionary) -> void:
 		remove_child(child)
 		child.queue_free()
 	room_name = layout.name
+	if ground_surface and ground_surface.material:
+		ground_surface.material.set_shader_parameter("base_tint", theme_vec3("base_tint", Vector3(0.39,0.40,0.37)))
+		ground_surface.material.set_shader_parameter("stone_mix", float(theme.get("stone_mix", 0.55)))
 	world_size = Vector2(layout.world_size[0],layout.world_size[1])
 	entry = Vector2(layout.entry[0], layout.entry[1])
 	exit_point = Vector2(layout.exit[0], layout.exit[1])
@@ -196,6 +212,8 @@ func add_terrain_mass(points: Array) -> void:
 	terrain.texture = ground
 	var earth_material := ShaderMaterial.new()
 	earth_material.shader = load("res://content/rooms/terrain_fill.gdshader")
+	earth_material.set_shader_parameter("earth_low", theme_vec3("earth_low", Vector3(0.19,0.21,0.17)))
+	earth_material.set_shader_parameter("earth_high", theme_vec3("earth_high", Vector3(0.33,0.32,0.26)))
 	terrain.material = earth_material
 	add_child(terrain)
 

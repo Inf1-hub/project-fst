@@ -7,6 +7,7 @@ var afterglows: Dictionary = {}
 var qualities: Dictionary = {}
 var encounters: Dictionary = {}
 var rooms: Array[Dictionary] = []
+var themes: Dictionary = {}
 
 
 func _init() -> void:
@@ -23,6 +24,8 @@ func _init() -> void:
 			target[row.id] = row
 	rooms = read_table("rooms")
 	assert(rooms.size() == 5)
+	for row in read_table("room_themes"):
+		themes[row.id] = row
 	validate()
 
 
@@ -44,6 +47,7 @@ func validate() -> void:
 	for room in rooms:
 		assert(room.outline.size() >= 5 and room.units.size() == room.spawns.size())
 		for kind in room.units: assert(kind in ["soldier", "archer", "horn", "boss"])
+		assert(themes.has(room.id), "Missing room theme: " + str(room.id))
 	for encounter in encounters.values():
 		for kind in encounter.units:
 			assert(kind in ["soldier", "archer", "horn", "boss"])
