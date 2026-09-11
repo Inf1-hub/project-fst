@@ -7,19 +7,25 @@ ITER-001～ITER-006 于 **2026-09-11 补录**，依据本任务历史、现有�
 ## ITER-014 · 场景地图优化：关卡辨识度
 
 - **日期**：2026-09-11
-- **状态**：进行中（第一步已完成并自查；后续步骤：地标/点缀色/掩体密度）。
-- **目标/原因**：五关（破营侧道/折院迂回/断墙长廊/废营纵深/主将前庭）视觉几乎一致，缺乏辨识度。先建立"每关主题"的数据驱动基础，从最见效的地表/地形色调差异化入手。
-- **实际改动（第一步）**：
-  - 新增 `data/room_themes.csv`：按房间 id 定义 `base_tint/stone_mix/earth_low/earth_high/prop_tint/accent`（冷灰统一基调下的温度/明度/色相差异，`accent`/`prop_tint` 供后续步骤使用）。
-  - `data/game_data.gd`：加载 `room_themes` 到 `themes`，并在 `validate()` 断言每关都有主题。
-  - `content/rooms/ground_tone.gdshader`、`terrain_fill.gdshader`：参数化色调（`base_tint/stone_mix`、`earth_low/earth_high`），默认值保持原观感。
-  - `content/rooms/border_room.gd`：新增 `theme` 与取色辅助，`configure` 时把主题写入地面材质，`add_terrain_mass` 写入地形材质。
-  - `app/bootstrap/bootstrap.gd`：`load_floor` 按当前关卡 id 取主题赋给 `room.theme` 再 `configure`。
-- **关键文件**：`data/room_themes.csv`、`data/game_data.gd`、`content/rooms/ground_tone.gdshader`、`content/rooms/terrain_fill.gdshader`、`content/rooms/border_room.gd`、`app/bootstrap/bootstrap.gd`。
+- **状态**：已实现并自查（第一、二步完成，五关视觉已明显区分）；后续可继续光照/地表分层/死代码清理。
+- **目标/原因**：五关（破营侧道/折院迂回/断墙长廊/废营纵深/主将前庭）视觉几乎一致，缺乏辨识度。建立"每关主题"的数据驱动基础，从地表/地形色调差异化 + 点缀色地标入手。
+- **实际改动**：
+  - 第一步（地表/地形按主题差异）：
+    - 新增 `data/room_themes.csv`：按房间 id 定义 `base_tint/stone_mix/earth_low/earth_high/prop_tint/accent`（冷灰统一基调下的温度/明度/色相差异）。
+    - `data/game_data.gd`：加载 `room_themes` 到 `themes`，`validate()` 断言每关都有主题。
+    - `content/rooms/ground_tone.gdshader`、`terrain_fill.gdshader`：参数化色调（`base_tint/stone_mix`、`earth_low/earth_high`），默认值保持原观感。
+    - `content/rooms/border_room.gd`：新增 `theme` 与取色辅助（`theme_vec3`/`theme_color`），`configure` 写入地面材质、`add_terrain_mass` 写入地形材质。
+    - `app/bootstrap/bootstrap.gd`：`load_floor` 按关卡 id 取主题赋给 `room.theme` 再 `configure`。
+  - 第二步（布景/掩体着色 + 点缀色地标）：
+    - `content/ruins/scenery_prop.gd`、`ruin_piece.gd`、`cover_cluster.gd`：新增 `tint`，把边界布景与掩体石材按主题 `prop_tint` 上色（默认值等同原观感）。
+    - 新增 `content/ruins/accent_banner.gd`：带落地阴影的主题战旗地标。
+    - `app/bootstrap/bootstrap.gd`：掩体/布景按 `prop_tint` 上色；在每关战术锚点（`zones`）放置 `accent` 色战旗作为焦点地标。
+- **关键文件**：`data/room_themes.csv`、`data/game_data.gd`、`content/rooms/ground_tone.gdshader`、`content/rooms/terrain_fill.gdshader`、`content/rooms/border_room.gd`、`content/ruins/scenery_prop.gd`、`content/ruins/ruin_piece.gd`、`content/ruins/cover_cluster.gd`、`content/ruins/accent_banner.gd`、`app/bootstrap/bootstrap.gd`。
 - **验证结果**：
   - 冒烟无脚本/着色器错误；`tools/godot.sh test` 五套全部 `0 failures`（含新增主题断言）。
-  - 经 `xvfb-run` 渲染五关截图自查：五关地表基调已明显拉开——L1 暖灰、L2 冷蓝灰、L3 中性尘灰、L4 橄榄暗绿、L5 冷钢蓝且最暗；角色与掩体可读性保持。
-- **遗留问题/下一步**：色调差异偏含蓄，需在第二步加入每关专属地标、点缀色（旗帜/篝火，使用 `accent`）、布景/掩体色调与密度差异，使辨识度更直接；随后再考虑光照/地表分层与死代码清理。
+  - 经 `xvfb-run` 渲染五关截图逐张自查：五关地表基调明显拉开（L1 暖灰、L2 冷蓝灰、L3 中性尘灰、L4 橄榄暗绿、L5 冷钢蓝且最暗）；战旗点缀色按关变化（L1 锈红、L2 苔绿、L4 橄榄黄、L5 主将前庭猩红），战旗带落地阴影；角色与掩体可读性保持。
+  - 修复过程：`var anchor := room.nearest_walkable(...)` 因目标函数未标注类型导致解析失败，改为显式 `var anchor: Vector2`。
+- **遗留问题/下一步**：辨识度已显著改善但仍可深化——建议后续加入 `CanvasModulate`/廉价方向光与更多落地阴影（体量感）、地表分层遮罩（路径/血迹引导视线）、掩体构型与密度按关差异，以及清理 `perimeter_wall`/`wall_module`/`distant_landscape` 死视觉代码（需同步 `terrain_contract_test` 与 `docs/mvp.md`）。战旗为非碰撞装饰，未改动战斗数值与几何。
 
 ## ITER-013 · Cloud Agent（Linux）开发环境搭建与实机验证
 

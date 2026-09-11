@@ -123,9 +123,11 @@ func load_floor(preserve: bool) -> void:
 	room.configure(data.rooms[stage_number - 1])
 	boss = null
 	add_fortress_dressing()
+	var cover_tint: Color = room.theme_color("prop_tint", Color(.85,.87,.86))
 	for rect in room.obstacles:
 		var wall = CoverCluster.new()
 		wall.footprint_size = rect.size
+		wall.tint = cover_tint
 		wall.position = Vector2(rect.get_center().x, rect.end.y)
 		actors.add_child(wall)
 	var previous_hp: float = player.hp if preserve and is_instance_valid(player) else data.value("player_hp")
@@ -207,6 +209,14 @@ func add_fortress_dressing() -> void:
 		shelter.art_size = Vector2(r[2]+80,r[3]+100)
 		shelter.tint = Color(1,1,1,.55)
 		actors.add_child(shelter)
+	# Per-level accent landmarks at the tactical anchors give each room a themed focal color.
+	var accent: Color = room.theme_color("accent", Color(.6,.2,.15))
+	for zone in room.zones:
+		var anchor: Vector2 = room.nearest_walkable(Vector2(zone.at[0], zone.at[1]))
+		var banner = preload("res://content/ruins/accent_banner.gd").new()
+		banner.position = anchor
+		banner.accent = accent
+		actors.add_child(banner)
 
 func add_scenery(at: Vector2, kind: int, width: float, mirror: bool) -> void:
 	var prop := preload("res://content/ruins/scenery_prop.gd").new()
@@ -214,6 +224,7 @@ func add_scenery(at: Vector2, kind: int, width: float, mirror: bool) -> void:
 	prop.atlas_index = kind
 	prop.art_width = width
 	prop.mirrored = mirror
+	prop.tint = room.theme_color("prop_tint", Color(.83,.87,.86))
 	actors.add_child(prop)
 
 
