@@ -4,6 +4,46 @@
 
 ITER-001～ITER-006 于 **2026-09-11 补录**，依据本任务历史、现有文件及本地测试日志整理；具体实施日期未逐次确认，不反推日期。历史测试只说明当时状态，不代表当前版本必然通过。`.local/` 中的日志可能被后续运行覆盖。
 
+## ITER-015 · 场景美术重构：向 POE2 参考图看齐（断墙长廊）
+
+- **日期**：2026-09-11
+- **状态**：已实现并自查（第三关等已接近参考图质量，系统对五关生效）；后续可继续加深氛围/直廊化/掩体换新美术。
+- **目标/原因**：用户明确 ITER-014 只是"色调滤镜 + 简陋旗子"，不合格；并提供 POE2 风格《断墙长廊》局部参考图作为质量标准（立体断墙围合长廊、火盆暖光、悬挂暗红破战旗、木桶马车、地面血迹/焚痕、昏暗高对比）。要求实质提升，缺素材自行生成。
+- **实际改动**：
+  - 素材生成管线：用内置 `GenerateImage` 按参考图风格生成 9 件透明素材；生成图会烘焙棋盘格"伪透明"且为 RGB，故新增 `tools/dekey_asset.py`（检测两种棋盘色 + 边界连通洪填抠背 + 去光晕 + 自动裁剪至内容，底边=落地点），产出干净 RGBA。素材：`ruin_wall_a/b`、`brazier`、`war_banner`、`barrels`、`war_cart`、`rubble_pile`、`decal_blood`、`decal_scorch`（存 `content/ruins/`）。
+  - 新组件：`content/ruins/scene_prop.gd`（底部锚点 + 落地接触阴影 + 主题着色）、`ground_decal.gd`（平铺贴花/可加色叠加的暖光池）。
+  - 光影：火盆位置用径向渐变的**加色暖光池**（`GroundDecal` additive，运行时生成 `GradientTexture2D`）铺在地面层；所有立体物件带落地阴影，形成暖/冷对比与体量感（在 GL Compatibility + 无界面 llvmpipe 下稳定，未依赖 `Light2D`）。
+  - 场景摆放（`bootstrap.add_fortress_dressing`/新增 `dress_route`）：沿可通行区边界用断墙 `scene_prop` 围合出长廊（取代旧"绿篱"边带）；沿主路径 `main_route` 布火盆；战术锚点挂战旗、放木桶与破马车；敌人出生点附近撒血迹/焚痕贴花（均为非碰撞装饰，放在地面层，位于 actors 之下）。
+  - 移除 ITER-014 的简陋手画战旗 `content/ruins/accent_banner.gd`。保留不可通行区的 `scenery_prop` 散布（满足地形契约：≥6 种、≥50 个、均在不可通行区）。
+- **关键文件**：`tools/dekey_asset.py`、`content/ruins/scene_prop.gd`、`content/ruins/ground_decal.gd`、`content/ruins/{ruin_wall_a,ruin_wall_b,brazier,war_banner,barrels,war_cart,rubble_pile,decal_blood,decal_scorch}.png`（含 `.import`）、`app/bootstrap/bootstrap.gd`。
+- **验证结果**：
+  - 冒烟无脚本/着色器错误；`tools/godot.sh test` 五套全部 `0 failures`（地形契约仍满足：五关 151–166 个 `scenery_prop`、6 种、均在不可通行区；掩体碰撞几何未改）。
+  - `xvfb-run` 渲染逐张自查：第三关"断墙长廊"已呈现立体断墙长廊、火盆暖光池、悬挂战旗、木桶/破马车、地面血迹，与参考图方向一致；五关系统性生效，角色/掩体可读性保持。
+- **遗留问题/下一步**：仍可继续逼近参考——整体再压暗+全屏暗角（需确认 HUD 在独立 CanvasLayer 以免被染暗）、把弯曲边界改为更规整直廊、把可碰撞掩体（`cover_cluster`/`ruin_piece`）换成新 `rubble_pile` 美术（保持碰撞多边形不变以过契约）、火盆加轻微火光闪烁。参考图 `source_assets/art_direction/poe2_ref_passage.png` 未纳入版本控制（含 HUD 的截图，按 gitignore 习惯不入库）。
+
+## ITER-014 · 场景地图优化：关卡辨识度
+
+- **日期**：2026-09-11
+- **状态**：已实现并自查（第一、二步完成，五关视觉已明显区分）；后续可继续光照/地表分层/死代码清理。
+- **目标/原因**：五关（破营侧道/折院迂回/断墙长廊/废营纵深/主将前庭）视觉几乎一致，缺乏辨识度。建立"每关主题"的数据驱动基础，从地表/地形色调差异化 + 点缀色地标入手。
+- **实际改动**：
+  - 第一步（地表/地形按主题差异）：
+    - 新增 `data/room_themes.csv`：按房间 id 定义 `base_tint/stone_mix/earth_low/earth_high/prop_tint/accent`（冷灰统一基调下的温度/明度/色相差异）。
+    - `data/game_data.gd`：加载 `room_themes` 到 `themes`，`validate()` 断言每关都有主题。
+    - `content/rooms/ground_tone.gdshader`、`terrain_fill.gdshader`：参数化色调（`base_tint/stone_mix`、`earth_low/earth_high`），默认值保持原观感。
+    - `content/rooms/border_room.gd`：新增 `theme` 与取色辅助（`theme_vec3`/`theme_color`），`configure` 写入地面材质、`add_terrain_mass` 写入地形材质。
+    - `app/bootstrap/bootstrap.gd`：`load_floor` 按关卡 id 取主题赋给 `room.theme` 再 `configure`。
+  - 第二步（布景/掩体着色 + 点缀色地标）：
+    - `content/ruins/scenery_prop.gd`、`ruin_piece.gd`、`cover_cluster.gd`：新增 `tint`，把边界布景与掩体石材按主题 `prop_tint` 上色（默认值等同原观感）。
+    - 新增 `content/ruins/accent_banner.gd`：带落地阴影的主题战旗地标。
+    - `app/bootstrap/bootstrap.gd`：掩体/布景按 `prop_tint` 上色；在每关战术锚点（`zones`）放置 `accent` 色战旗作为焦点地标。
+- **关键文件**：`data/room_themes.csv`、`data/game_data.gd`、`content/rooms/ground_tone.gdshader`、`content/rooms/terrain_fill.gdshader`、`content/rooms/border_room.gd`、`content/ruins/scenery_prop.gd`、`content/ruins/ruin_piece.gd`、`content/ruins/cover_cluster.gd`、`content/ruins/accent_banner.gd`、`app/bootstrap/bootstrap.gd`。
+- **验证结果**：
+  - 冒烟无脚本/着色器错误；`tools/godot.sh test` 五套全部 `0 failures`（含新增主题断言）。
+  - 经 `xvfb-run` 渲染五关截图逐张自查：五关地表基调明显拉开（L1 暖灰、L2 冷蓝灰、L3 中性尘灰、L4 橄榄暗绿、L5 冷钢蓝且最暗）；战旗点缀色按关变化（L1 锈红、L2 苔绿、L4 橄榄黄、L5 主将前庭猩红），战旗带落地阴影；角色与掩体可读性保持。
+  - 修复过程：`var anchor := room.nearest_walkable(...)` 因目标函数未标注类型导致解析失败，改为显式 `var anchor: Vector2`。
+- **遗留问题/下一步**：辨识度已显著改善但仍可深化——建议后续加入 `CanvasModulate`/廉价方向光与更多落地阴影（体量感）、地表分层遮罩（路径/血迹引导视线）、掩体构型与密度按关差异，以及清理 `perimeter_wall`/`wall_module`/`distant_landscape` 死视觉代码（需同步 `terrain_contract_test` 与 `docs/mvp.md`）。战旗为非碰撞装饰，未改动战斗数值与几何。
+
 ## ITER-013 · Cloud Agent（Linux）开发环境搭建与实机验证
 
 - **日期**：2026-09-11

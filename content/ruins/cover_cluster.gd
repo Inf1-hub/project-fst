@@ -2,6 +2,7 @@ extends Node2D
 ## Layout rectangles are placement envelopes, never physical shapes.
 const Piece = preload("res://content/ruins/ruin_piece.gd")
 var footprint_size := Vector2(300,100)
+var tint := Color(.85,.87,.86)
 
 static func pieces(size: Vector2) -> Array:
 	var result: Array = []
@@ -32,4 +33,5 @@ func _ready() -> void:
 		piece.position = item.at + Vector2(0,item.size.y*.5)
 		piece.extent = item.size
 		piece.variant = item.variant
+		piece.tint = tint
 		add_child(piece)

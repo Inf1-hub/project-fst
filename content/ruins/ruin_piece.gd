@@ -2,6 +2,7 @@ extends Node2D
 ## Upright painted masonry; Y anchor is the front ground contact, not image center.
 var extent := Vector2(180,65)
 var variant := 0
+var tint := Color(.85,.87,.86)
 var wall: AtlasTexture
 var rubble: Texture2D
 func _ready() -> void:
@@ -17,12 +18,12 @@ func _draw() -> void:
 	var width := extent.x
 	var height := width * .65 + extent.y * .30
 	var bank_height := width / 3.0
-	draw_texture_rect(rubble,Rect2(-width*.53,-bank_height,width*1.06,bank_height),false,Color(.85,.88,.86))
+	draw_texture_rect(rubble,Rect2(-width*.53,-bank_height,width*1.06,bank_height),false,tint)
 	if variant == 1:
 		# Fallen core uses a compact section, preserving its natural image aspect.
 		var source := Rect2(rubble.get_size()*Vector2(.28,.08),rubble.get_size()*Vector2(.40,.84))
-		draw_texture_rect_region(rubble,Rect2(-width*.5,-width*.70,width,width*.70),source,Color(.85,.88,.86))
+		draw_texture_rect_region(rubble,Rect2(-width*.5,-width*.70,width,width*.70),source,tint)
 	if variant != 1:
 		draw_set_transform(Vector2.ZERO,0,Vector2(-1 if variant % 2 else 1,1))
-		draw_texture_rect(wall,Rect2(-width*.48,-height-extent.y*.18,width*.96,height),false,Color(.83,.87,.89))
+		draw_texture_rect(wall,Rect2(-width*.48,-height-extent.y*.18,width*.96,height),false,tint)
 		draw_set_transform(Vector2.ZERO)
