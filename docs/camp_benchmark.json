@@ -1,0 +1,31 @@
+{
+	"renderer": "NVIDIA GeForce RTX 4060 Laptop GPU",
+	"resolution": "1920x1080",
+	"samples": [
+		{
+			"draw_calls": 184.0,
+			"entities": 28,
+			"mean_frame_ms": 1.87547435897436,
+			"p95_frame_ms": 3.307,
+			"quality": "low",
+			"static_memory_mb": 80.8955602645874
+		},
+		{
+			"draw_calls": 252.0,
+			"entities": 28,
+			"mean_frame_ms": 2.77361666666666,
+			"p95_frame_ms": 4.77,
+			"quality": "medium",
+			"static_memory_mb": 80.9655542373657
+		},
+		{
+			"draw_calls": 294.0,
+			"entities": 28,
+			"mean_frame_ms": 3.37638846153847,
+			"p95_frame_ms": 5.443,
+			"quality": "high",
+			"static_memory_mb": 80.9969186782837
+		}
+	],
+	"uncapped": true
+}

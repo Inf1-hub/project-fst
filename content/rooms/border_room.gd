@@ -230,13 +230,6 @@ func clear_obstacles(from: Vector2, to: Vector2) -> bool:
 
 func _draw() -> void:
 	if outline.is_empty(): return
-	for screen in sight_screens:
-		var r: Array = screen.rect
-		var rect := Rect2(r[0],r[1],r[2],r[3])
-		draw_rect(rect,Color(.25,.46,.40,.22))
-		var at := rect.get_center()
-		draw_line(at,at+Vector2(70,0),Color("8eb8a5"),3)
-		draw_polyline(PackedVector2Array([at+Vector2(50,-12),at+Vector2(70,0),at+Vector2(50,12)]),Color("8eb8a5"),3)
 	for at in supplies:
 		draw_circle(at,26,Color(.46,.67,.44,.25))
 		draw_line(at-Vector2(13,0),at+Vector2(13,0),Color("c4d8a4"),5)

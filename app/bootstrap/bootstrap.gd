@@ -155,6 +155,7 @@ func load_floor(preserve: bool) -> void:
 		var at := Vector2(layout.spawns[index][0], layout.spawns[index][1])
 		var enemy = spawn_enemy(str(layout.units[index]), at, "%s_%d" % [layout.id, index / int(data.value("encounter_squad_size"))])
 		if enemy.kind == "boss": boss = enemy
+	apply_camp_light_budget()
 	mode = "playing" if preserve else "start"
 	queue_redraw()
 
@@ -174,7 +175,12 @@ func add_fortress_dressing() -> void:
 			while step < length:
 				var foot := a.lerp(b,step/length)+normal*55
 				if not room.contains(foot):
-					add_scenery(foot,3 if serial%4 != 0 else 5,180+serial%3*25,serial%2==0)
+					if serial%3 == 2 and normal.y < -.25:
+						add_camp(foot,1 if serial%2 else 2,260,serial%2==0)
+					else:
+						add_scenery(foot,3 if serial%4 != 0 else 5,180+serial%3*25,serial%2==0)
+					if serial%11 == 3:
+						add_camp(foot+normal*12,3,64,false)
 					serial += 1
 				step += 155
 			carry = step-length
@@ -197,15 +203,40 @@ func add_fortress_dressing() -> void:
 			for delta in [Vector2(-.5,0),Vector2(.5,0),Vector2(-.5,-1.1),Vector2(.5,-1.1),Vector2(0,-.6)]:
 				if room.contains(at+delta*width): fits = false
 			if not fits: kind = 5; width = minf(width,200)
-			add_scenery(at,kind,width,rng.randf()>.5)
+			if (kind == 1 or kind == 4) and x%3 != 0:
+				add_camp(at,0 if kind==1 else 2,width,rng.randf()>.5)
+			else:
+				add_scenery(at,kind,width,rng.randf()>.5)
+	var landmarks := FileAccess.open("res://data/camp_landmarks.csv",FileAccess.READ)
+	landmarks.get_csv_line()
+	while not landmarks.eof_reached():
+		var row := landmarks.get_csv_line()
+		if row.size()<6 or int(row[0]) != stage_number: continue
+		var at := Vector2(float(row[1]),float(row[2]))
+		if not room.contains(at): add_camp(at,int(row[3]),float(row[4]),row[5]=="1")
 	for screen in room.sight_screens:
 		var r: Array = screen.rect
-		var shelter := Dressing.new()
-		shelter.texture_path = "res://content/ruins/abandoned_camp_v3.png"
+		var shelter := preload("res://content/ruins/camp_prop.gd").new()
+		shelter.variant = 1
 		shelter.position = Vector2(r[0]+r[2]*.5,r[1]+r[3])
-		shelter.art_size = Vector2(r[2]+80,r[3]+100)
-		shelter.tint = Color(1,1,1,.55)
+		shelter.art_width = r[2]+90
+		shelter.add_to_group("walkable_shelter")
 		actors.add_child(shelter)
+
+func add_camp(at: Vector2, kind: int, width: float, mirror: bool) -> void:
+	var prop := preload("res://content/ruins/camp_prop.gd").new()
+	prop.position = at
+	prop.variant = kind
+	prop.art_width = width
+	prop.mirrored = mirror
+	actors.add_child(prop)
+
+func apply_camp_light_budget() -> void:
+	var lights := get_tree().get_nodes_in_group("camp_lights")
+	var limit := 0 if int(quality.decoration)==0 else (4 if int(quality.decoration)==1 else 8)
+	# Prioritize light sources near the player, never spend on remote map regions.
+	lights.sort_custom(func(a,b): return a.global_position.distance_squared_to(player.position)<b.global_position.distance_squared_to(player.position))
+	for i in lights.size(): lights[i].enabled = i<limit
 
 func add_scenery(at: Vector2, kind: int, width: float, mirror: bool) -> void:
 	var prop := preload("res://content/ruins/scenery_prop.gd").new()
@@ -249,6 +280,7 @@ func set_quality(id: String, save: bool = true) -> void:
 	Engine.max_fps = int(quality.max_fps)
 	# Compatibility/GLES3 does not support 2D MSAA. Use filtered mipmapped art.
 	get_viewport().canvas_item_default_texture_filter = Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	apply_camp_light_budget()
 	room.decoration = int(quality.decoration)
 	room.queue_redraw()
 	if save:
@@ -295,6 +327,9 @@ func _process(_delta: float) -> void:
 	observation_clock -= _delta
 	if observation_clock <= 0 and is_instance_valid(player):
 		observation_clock = .1
+		apply_camp_light_budget()
+		for shelter in get_tree().get_nodes_in_group("walkable_shelter"):
+			shelter.modulate.a = .42 if room.shelter_at(player.position) else 1.0
 		for enemy in enemies:
 			enemy.visible = can_observe(player.position,enemy.position)
 	if capture_frames > 0:

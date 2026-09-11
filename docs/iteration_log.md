@@ -4,6 +4,18 @@
 
 ITER-001～ITER-006 于 **2026-09-11 补录**，依据本任务历史、现有文件及本地测试日志整理；具体实施日期未逐次确认，不反推日期。历史测试只说明当时状态，不代表当前版本必然通过。`.local/` 中的日志可能被后续运行覆盖。
 
+## ITER-013 · 按理想效果图接入军营组件与冷暖光照
+
+- **日期**：2026-09-11
+- **状态**：本轮素材、样板布景与验证完成；整体美术尚未达到参考图品质。
+- **目标/原因**：用户提供理想效果图，要求分析后继续，并明确允许自行生成所需新素材。目标为冷灰废墟、成组军需道具与局部橙色火光，清楚保留战斗路线。
+- **实际改动**：内置 image_gen 生成营帐、破旗拒马、残墙、火盆四类透明组件并接入五关布景；第三关以 CSV 追加三组前景样板布置。图集使用实测非等分区域，原比例绘制，启用 mipmaps。地面材质调整明暗，增加程序泥污与暗红痕迹；遮蔽点换成军营道具并在角色进入后淡出，移除绿色调试色块。火光按距离分配，低/中/高分别最多 0/4/8 盏，无实时阴影。
+- **关键文件**：`content/ruins/camp_atlas_v1.png`、`content/ruins/camp_prop.gd`、`content/rooms/ground_tone.gdshader`、`app/bootstrap/bootstrap.gd`、`data/camp_landmarks.csv`、`tests/terrain_contract_test.gd`、`docs/camp_art_direction.md`、`source_assets/camp_generation.json`、`docs/screenshots/camp_reference_pass.png`、`docs/camp_benchmark.json`。`camp_landmarks.csv.import` 与其他数据表一致使用 `importer=keep`；`.gitignore` 忽略 `data/*.translation`，避免把 Godot 误生成的翻译产物纳入版本控制。
+- **验证结果**：首次生成网络失败，重试成功，读取 PNG 确认 RGBA 与真实透明像素。`tools/godot.ps1 check`、`test` 全部通过，新增三档光源上限检查。首次图形压力测试出现 2 个退出资源残留，增加最后实例退出时释放缓存后，地形测试及图形压力测试均无该警告。
+  - 最后一次压力测试：RTX 4060 Laptop、1080p、28 敌人；低/中/高平均 1.875/2.774/3.376 ms，P95 3.307/4.770/5.443 ms，静态内存约 81 MB。第三关最后追加的三组纯布景在该测试之后进行了五关截图检查，不影响压力测试所在第四关。
+  - 实机截图已检查，保存到 `docs/screenshots/camp_reference_pass.png`；截图按现有 Git 规则只保留本机。
+- **遗留问题/下一步**：当前保留较多岩体重复，地面变化与场景构图的自然程度仍弱于参考图；火焰主要来自素材，动态火焰与接触阴影未实现。程序暗红痕迹不是实时战斗血迹；整局自动战斗历史失败尚未在此轮处理。
+
 ## ITER-012 · 初始化 Git 并推送到 GitHub
 
 - **日期**：2026-09-11

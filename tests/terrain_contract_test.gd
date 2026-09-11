@@ -43,6 +43,14 @@ func run() -> void:
 				for y in range(int(rect.position.y/40),ceili(rect.end.y/40)):
 					var at := Vector2(x*40+20,y*40+20)
 					if game.room.navigation.is_point_solid(Vector2i(x,y)) == game.room.is_walkable(at,48): failures += 1
+		for quality in ["low","medium","high"]:
+			game.set_quality(quality,false)
+			var enabled := 0
+			for light in get_nodes_in_group("camp_lights"):
+				if light.enabled: enabled += 1
+			var budget := 0 if quality=="low" else (4 if quality=="medium" else 8)
+			if enabled > budget: failures += 1
+		game.set_quality("medium",false)
 		var kinds := {}
 		var scenery_count := 0
 		for actor in game.actors.get_children():

@@ -1,6 +1,8 @@
 # Godot 本地缓存与导入产物
 .godot/
 .import/
+# 数据 CSV 使用 importer=keep；勿把误当翻译表生成的 .translation 纳入版本控制
+data/*.translation
 
 # 本机日志、捕获图、临时脚本
 .local/

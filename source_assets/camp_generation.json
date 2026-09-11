@@ -1,0 +1,6 @@
+{
+  "mode": "built-in image_gen",
+  "prompt": "Transparent RGBA sprite sheet, 1536x1024, four isolated props in 2x2 cells with generous clear margins. True alpha outside objects; no background, labels, frames or checkerboard. Fixed elevated 55-degree three-quarter view for dark medieval realistic hand-painted game, cold grey weathered stone, dark timber, tattered oxblood cloth, subdued orange fire. Upper left: ruined red canvas army supply tent with barrels sacks a broken wheel and debris. Upper right: burgundy battle banner with spiked barricade, broken cart wheel, shields and a small flaming iron brazier, one asymmetric group. Lower left: broken limestone defensive wall with shattered arch at left tapering into low rubble right, ivy and dead shrubs. Lower right: a single flaming iron brazier on stone feet, tiny sparks, no other large props. Keep every prop fully inside its quadrant, no overlapping cells. Natural proportions, visible tops and fronts, intricate irregular silhouettes. Ground contact only, no floor rectangles, no characters. These are game assets, not an illustration of a whole battlefield.",
+  "runtime_asset": "content/ruins/camp_atlas_v1.png",
+  "reference": "User supplied ideal battlefield image; cold grey military ruins with restrained orange braziers"
+}
