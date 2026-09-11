@@ -4,6 +4,29 @@
 
 ITER-001～ITER-006 于 **2026-09-11 补录**，依据本任务历史、现有文件及本地测试日志整理；具体实施日期未逐次确认，不反推日期。历史测试只说明当时状态，不代表当前版本必然通过。`.local/` 中的日志可能被后续运行覆盖。
 
+## ITER-013 · Cloud Agent（Linux）开发环境搭建与实机验证
+
+- **日期**：2026-09-11
+- **状态**：已完成并本地验证；环境保存（Save）为用户侧动作，待用户在环境面板确认。
+- **目标/原因**：原工程仅提供 Windows 引擎路径与 `tools/godot.ps1`，Cloud Agent 运行于 Linux（Ubuntu 24.04 x86_64）。需要在无预置引擎的 Linux VM 上一键准备同版本 Godot 并运行工程，证明环境可用。
+- **实际改动**：
+  - 新增 `.cursor/environment.json`：使用 Cursor 默认镜像，`install` 执行 `bash .cursor/install.sh`。
+  - 新增 `.cursor/install.sh`：按 `engine.version` 解析并下载官方 `Godot_v4.7.2-stable_linux.x86_64` 到 `~/.local/share/godot/godot`，校验 `--version` 精确匹配 `4.7.2.stable.official.ed1daf0bf`，软链到 `~/.local/bin/godot`，随后无界面导入资源。幂等：已匹配则跳过下载；仅在缺少 `xvfb-run/unzip/curl/libGL` 时才 `apt` 补装。
+  - 新增 `tools/godot.sh`：Linux 版开发脚本，任务与 `tools/godot.ps1` 对齐（editor/run/check/test/playtest/benchmark）；有窗口任务在无 `DISPLAY` 时经 `xvfb-run` 软件渲染（Mesa llvmpipe）。
+  - 未改动任何游戏代码、数值或资源；`tools/godot.ps1` 与 Windows 流程保持不变。
+- **关键文件**：`.cursor/environment.json`、`.cursor/install.sh`、`tools/godot.sh`、`docs/iteration_log.md`。
+- **验证结果**（本机 Cloud VM，Ubuntu 24.04 x86_64，Godot 4.7.2.stable.official.ed1daf0bf）：
+  - 引擎版本精确匹配；`--headless --import` 资源导入通过。
+  - `tools/godot.sh check`：PASS（引擎版本、导入、启动）。
+  - `tools/godot.sh test`：全部通过——`TERRAIN CONTRACT: 0 failures`、`TACTICAL TEST: 0 failures`、`CAMERA TEST: 0 failures`、`ROOM FLOW: 0 failures`、`MVP TESTS: 0 failures`。
+  - `benchmark`（无界面、28 敌、低/中/高）：mean ≈ 6.90/6.90/6.90 ms，p95 ≈ 7.91/8.06/8.07 ms，静态内存 ≈ 73.8 MB（软件渲染 llvmpipe，`draw_calls` 报 0，仅代表本机该场景，非渲染性能规律）。
+  - 有窗口渲染：经 `xvfb-run` 用 `tests/visual_capture.gd` 生成标题、五关、走廊、远射阵地等截图，画面正常；另用临时录制脚本驱动真实输入录制约 15 秒战斗片段并核验（角色移动、近战特效、清场后移动、HUD 与小地图正常，无渲染异常）。临时录制脚本 `tests/_demo_capture.gd` 已删除，不纳入提交。
+  - `install.sh` 幂等：首次全新安装约 3 分钟（含 apt 与下载）；已就绪后重复运行约 2.5 秒，跳过下载与 apt。
+- **遗留问题/下一步**：
+  - `tools/godot.sh playtest`（自动通关）本次仍**失败**：种子 `131833513`，击杀 41 名敌人后第 29900 帧死亡。此为 ITER-006 记录的历史游戏平衡问题，非环境问题（引擎、导入、其余测试均正常），本次不在环境搭建范围内修复。
+  - 音频在无声卡 VM 回退为 dummy 驱动（ALSA 无 card），属预期，不影响逻辑与渲染。
+  - 环境 Save 由用户在环境面板完成；快照/构建验证结果见本次交付说明。
+
 ## ITER-012 · 初始化 Git 并推送到 GitHub
 
 - **日期**：2026-09-11
