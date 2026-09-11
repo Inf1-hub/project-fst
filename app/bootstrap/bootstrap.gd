@@ -7,6 +7,8 @@ const Player = preload("res://actors/player/player.gd")
 const Room = preload("res://content/rooms/border_room.tscn")
 const Dressing = preload("res://content/ruins/fortress_dressing.gd")
 const CoverCluster = preload("res://content/ruins/cover_cluster.gd")
+const SceneProp = preload("res://content/ruins/scene_prop.gd")
+const GroundDecal = preload("res://content/ruins/ground_decal.gd")
 const FxPool = preload("res://combat/effects/fx_pool.gd")
 const ProjectilePool = preload("res://combat/effects/projectile_pool.gd")
 const Sound = preload("res://audio/combat_audio.gd")
@@ -163,7 +165,10 @@ func load_floor(preserve: bool) -> void:
 
 
 func add_fortress_dressing() -> void:
-	# Fixed-perspective cutouts replace the narrow projected perimeter ribbons.
+	var ptint: Color = room.theme_color("prop_tint", Color(.85,.87,.86))
+	var wall_a := load("res://content/ruins/ruin_wall_a.png")
+	var wall_b := load("res://content/ruins/ruin_wall_b.png")
+	# 1) Ruined walls line the play-area edge, forming the corridor instead of a hedge ribbon.
 	var serial := 0
 	for boundary in room.boundaries:
 		var carry := 0.0
@@ -175,13 +180,19 @@ func add_fortress_dressing() -> void:
 			var length := a.distance_to(b)
 			var step := carry
 			while step < length:
-				var foot := a.lerp(b,step/length)+normal*55
+				var foot := a.lerp(b,step/length)+normal*46
 				if not room.contains(foot):
-					add_scenery(foot,3 if serial%4 != 0 else 5,180+serial%3*25,serial%2==0)
+					var wall = SceneProp.new()
+					wall.texture = wall_a if serial%2==0 else wall_b
+					wall.art_width = 300.0+float(serial%3)*80.0
+					wall.mirrored = serial%2==1
+					wall.tint = ptint
+					wall.position = foot
+					actors.add_child(wall)
 					serial += 1
-				step += 155
+				step += 235
 			carry = step-length
-	# Fill inaccessible interiors in staggered groups, with broad landmarks set back.
+	# 2) Fill inaccessible interiors with scenery (backdrop depth; keeps ≥6 kinds / ≥50 props).
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 731+stage_number
 	for y in range(160,3800,260):
@@ -195,7 +206,6 @@ func add_fortress_dressing() -> void:
 			if clearance < 145: continue
 			var kind := rng.randi_range(0,5)
 			var width := minf(clearance*1.3,rng.randf_range(290,560))
-			# Check the full projected sprite envelope so large props cannot mask lanes.
 			var fits := true
 			for delta in [Vector2(-.5,0),Vector2(.5,0),Vector2(-.5,-1.1),Vector2(.5,-1.1),Vector2(0,-.6)]:
 				if room.contains(at+delta*width): fits = false
@@ -209,14 +219,85 @@ func add_fortress_dressing() -> void:
 		shelter.art_size = Vector2(r[2]+80,r[3]+100)
 		shelter.tint = Color(1,1,1,.55)
 		actors.add_child(shelter)
-	# Per-level accent landmarks at the tactical anchors give each room a themed focal color.
-	var accent: Color = room.theme_color("accent", Color(.6,.2,.15))
+	dress_route(rng)
+
+
+func dress_route(rng: RandomNumberGenerator) -> void:
+	var layout: Dictionary = data.rooms[stage_number-1]
+	# Braziers with warm glow pools along the main path give the corridor light and rhythm.
+	var route: Array = layout.get("main_route", [])
+	for idx in route.size():
+		if idx % 2 == 1: continue
+		place_brazier(room.nearest_walkable(Vector2(route[idx][0], route[idx][1])))
+	# A tattered war banner marks each tactical anchor.
 	for zone in room.zones:
-		var anchor: Vector2 = room.nearest_walkable(Vector2(zone.at[0], zone.at[1]))
-		var banner = preload("res://content/ruins/accent_banner.gd").new()
-		banner.position = anchor
-		banner.accent = accent
+		var at: Vector2 = room.nearest_walkable(Vector2(zone.at[0], zone.at[1]))
+		var banner = SceneProp.new()
+		banner.texture = load("res://content/ruins/war_banner.png")
+		banner.art_width = 92.0
+		banner.mirrored = rng.randf() > .5
+		banner.position = at + Vector2(84, 6)
 		actors.add_child(banner)
+	# Barrels and a broken cart add battlefield clutter near the anchors.
+	if not room.zones.is_empty():
+		var z0: Vector2 = room.nearest_walkable(Vector2(room.zones[0].at[0], room.zones[0].at[1]))
+		var barrels = SceneProp.new()
+		barrels.texture = load("res://content/ruins/barrels.png")
+		barrels.art_width = 150.0
+		barrels.position = z0 + Vector2(-96, 40)
+		actors.add_child(barrels)
+		var last: Dictionary = room.zones[room.zones.size()-1]
+		var cart = SceneProp.new()
+		cart.texture = load("res://content/ruins/war_cart.png")
+		cart.art_width = 260.0
+		cart.mirrored = true
+		cart.position = room.nearest_walkable(Vector2(last.at[0], last.at[1])) + Vector2(120, -30)
+		actors.add_child(cart)
+	# Blood and scorch decals on the ground near where fights happen.
+	var blood := load("res://content/ruins/decal_blood.png")
+	var scorch := load("res://content/ruins/decal_scorch.png")
+	for i in layout.spawns.size():
+		var at: Vector2 = room.nearest_walkable(Vector2(layout.spawns[i][0], layout.spawns[i][1]))
+		var decal = GroundDecal.new()
+		decal.texture = blood if i % 3 != 0 else scorch
+		decal.art_width = 150.0 + rng.randf_range(0, 70)
+		decal.tint = Color(1, 1, 1, 0.62)
+		decal.rotation = rng.randf() * TAU
+		decal.position = at + Vector2(rng.randf_range(-40, 40), rng.randf_range(-30, 30))
+		room.add_child(decal)
+
+
+var _glow_texture: Texture2D
+func glow_texture() -> Texture2D:
+	if _glow_texture != null:
+		return _glow_texture
+	var gradient := Gradient.new()
+	gradient.set_color(0, Color(1.0, 0.74, 0.40, 0.85))
+	gradient.set_color(1, Color(1.0, 0.55, 0.25, 0.0))
+	var tex := GradientTexture2D.new()
+	tex.gradient = gradient
+	tex.fill = GradientTexture2D.FILL_RADIAL
+	tex.fill_from = Vector2(0.5, 0.5)
+	tex.fill_to = Vector2(1.0, 0.5)
+	tex.width = 256
+	tex.height = 256
+	_glow_texture = tex
+	return tex
+
+
+func place_brazier(at: Vector2) -> void:
+	var glow = GroundDecal.new()
+	glow.texture = glow_texture()
+	glow.additive = true
+	glow.art_width = 540.0
+	glow.tint = Color(1, 1, 1, 0.9)
+	glow.position = at
+	room.add_child(glow)
+	var body = SceneProp.new()
+	body.texture = load("res://content/ruins/brazier.png")
+	body.art_width = 118.0
+	body.position = at
+	actors.add_child(body)
 
 func add_scenery(at: Vector2, kind: int, width: float, mirror: bool) -> void:
 	var prop := preload("res://content/ruins/scenery_prop.gd").new()
