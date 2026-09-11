@@ -4,6 +4,32 @@
 
 ITER-001～ITER-006 于 **2026-09-11 补录**，依据本任务历史、现有文件及本地测试日志整理；具体实施日期未逐次确认，不反推日期。历史测试只说明当时状态，不代表当前版本必然通过。`.local/` 中的日志可能被后续运行覆盖。
 
+## ITER-016 · 场景道具碰撞 + 消除"浮空"
+
+- **日期**：2026-09-11
+- **状态**：已实现并验证（碰撞经物理仿真断言 + 渲染演示；落地阴影经前后对比）。ITER-015 遗留的整体压暗/直廊化等仍未做。
+- **目标/原因**：用户反馈"各种地形/建筑完全没有碰撞，还有很多东西看着像浮在空中"。ITER-015 新加的火盆/木桶/马车是纯视觉 `scene_prop`，玩家/敌人可直接穿过并"站在火盆里"；掩体碎石与部分立体物件缺少接触阴影，读起来像贴纸/悬浮。
+- **实际改动**：
+  - 碰撞系统（`content/rooms/border_room.gd`）：新增装饰性实体障碍通道，**独立于** `obstacle_polygons`（掩体），因此不影响视线判定与地形契约。
+    - 新增 `prop_blockers`/`prop_bounds` 及 `add_prop_blocker(polygon)`：为道具底面注册凸多边形 `StaticBody2D`（layer 1，物理阻挡玩家/敌人的 `move_and_slide`），并按 `bounds.grow(80)` 用统一 `is_walkable(...,48)` 重烘导航网格 solid、重建 `safe_points`，保证 `is_point_solid == not is_walkable` 一致（地形契约要求）。
+    - `prop_at`/`clear_props` 参与 `is_walkable` 与 `clear_movement`（仅 AI 寻路），使敌人绕行；`has_line_of_sight` 仍只用掩体几何，道具不挡视线（战斗手感与既有测试稳定）。
+    - `configure` 开头清空 `prop_blockers/prop_bounds`（道具碰撞体为 room 子节点，换关自动回收）。
+  - 摆放（`app/bootstrap/bootstrap.gd`）：
+    - 火盆从"压在主路径正中"改为沿路径切线**侧翼偏移 105px**摆放，既照亮走廊又不堵路；火盆/木桶/破马车调用新增 `add_prop_footprint(center,rx,ry)` 注册椭圆底面碰撞（火盆 36×22、木桶 72×38、马车 104×48；战旗杆 20×13）。
+    - `add_prop_footprint` 守卫：距 entry/exit <160 或落点非可通行则跳过，避免封死出生/传送通道。
+    - 战旗 `art_width` 92→150 并 `shadow_scale=0.6`，落地更稳；边界断墙 `shadow_scale=0.5` 避免地面出现过重暗带。
+  - 消除浮空（接触阴影）：`content/ruins/ruin_piece.gd` 掩体碎石新增双层柔和椭圆接触阴影；`content/ruins/scene_prop.gd` 阴影改为按底宽自适应的双层柔椭圆（`max(art_width*0.46,42)*shadow_scale`），保证细高物件（战旗）也焊接地面。
+- **关键文件**：`content/rooms/border_room.gd`、`app/bootstrap/bootstrap.gd`、`content/ruins/scene_prop.gd`、`content/ruins/ruin_piece.gd`。
+- **验证结果**（Cloud VM，Godot 4.7.2.stable，`xvfb-run` 软渲染）：
+  - `tools/godot.sh test` 五套全部 `0 failures`（地形契约含导航一致性、掩体几何、布景计数均通过；新增道具凸多边形被计入 physical 不影响契约）。
+  - 物理碰撞断言（临时脚本）：对首个道具 `nav_solid=true`、`prop_at(center)=true`；以 900px/s 连续 60 帧推玩家撞入，`prop_at(player,-6)=false`（玩家被挡住并沿边滑走，从未进入道具内部）。
+  - 渲染演示：录制玩家正面撞"破马车"约 3 秒视频，玩家被挡停并沿边缘滑动、Y 排序正确从道具后方通过（经 videoReview 复核确认无穿模、无闪烁）。前后对比图显示火盆由"角色站在火盆里"改为侧翼实体、战旗与掩体碎石由悬浮/贴纸变为带接触阴影落地。
+  - 临时渲染/演示脚本（`tests/_inspect.gd`、`tests/_before.gd`、`tests/_demo_collision.gd`）已删除，不纳入提交。
+- **遗留问题/下一步**：
+  - `tools/godot.sh playtest`（自动通关 bot）仍失败，且**与本次改动无关**：对照测试证实变更前后同种子在同一帧、同击杀数死亡（seed=2/4 均约第 12000 帧、3 杀），属 ITER-006/ITER-013 记录的历史平衡问题，不在本次范围。
+  - 边界断墙仍靠 outline 的 `SegmentShape2D` 提供碰撞（玩家止步于轮廓线/墙面），未对每段断墙单独加碰撞以免加厚边界影响寻路；如需断墙可"贴墙站"之外的实体感可后续评估。
+  - ITER-015 遗留（整体压暗+暗角、直廊化、掩体换 `rubble_pile` 美术、火光闪烁）仍未做。
+
 ## ITER-015 · 场景美术重构：向 POE2 参考图看齐（断墙长廊）
 
 - **日期**：2026-09-11

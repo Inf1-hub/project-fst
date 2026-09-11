@@ -186,6 +186,7 @@ func add_fortress_dressing() -> void:
 					wall.texture = wall_a if serial%2==0 else wall_b
 					wall.art_width = 300.0+float(serial%3)*80.0
 					wall.mirrored = serial%2==1
+					wall.shadow_scale = 0.5
 					wall.tint = ptint
 					wall.position = foot
 					actors.add_child(wall)
@@ -224,21 +225,30 @@ func add_fortress_dressing() -> void:
 
 func dress_route(rng: RandomNumberGenerator) -> void:
 	var layout: Dictionary = data.rooms[stage_number-1]
-	# Braziers with warm glow pools along the main path give the corridor light and rhythm.
+	# Braziers with warm glow pools flank the main path so they light the corridor
+	# without standing in the walking lane. Each one is a real solid you route around.
 	var route: Array = layout.get("main_route", [])
 	for idx in route.size():
 		if idx % 2 == 1: continue
-		place_brazier(room.nearest_walkable(Vector2(route[idx][0], route[idx][1])))
-	# A tattered war banner marks each tactical anchor.
+		var p := Vector2(route[idx][0], route[idx][1])
+		var tangent := Vector2.RIGHT
+		if idx + 1 < route.size(): tangent = Vector2(route[idx+1][0], route[idx+1][1]) - p
+		elif idx - 1 >= 0: tangent = p - Vector2(route[idx-1][0], route[idx-1][1])
+		var side := tangent.orthogonal().normalized()
+		if idx % 4 == 0: side = -side
+		place_brazier(room.nearest_walkable(p + side * 105.0))
+	# A tattered war banner marks each tactical anchor; its pole base is a slim solid.
 	for zone in room.zones:
 		var at: Vector2 = room.nearest_walkable(Vector2(zone.at[0], zone.at[1]))
 		var banner = SceneProp.new()
 		banner.texture = load("res://content/ruins/war_banner.png")
-		banner.art_width = 92.0
+		banner.art_width = 150.0
+		banner.shadow_scale = 0.6
 		banner.mirrored = rng.randf() > .5
-		banner.position = at + Vector2(84, 6)
+		banner.position = at + Vector2(96, 8)
 		actors.add_child(banner)
-	# Barrels and a broken cart add battlefield clutter near the anchors.
+		add_prop_footprint(banner.position, 20.0, 13.0)
+	# Barrels and a broken cart add battlefield clutter near the anchors, with collision.
 	if not room.zones.is_empty():
 		var z0: Vector2 = room.nearest_walkable(Vector2(room.zones[0].at[0], room.zones[0].at[1]))
 		var barrels = SceneProp.new()
@@ -246,6 +256,7 @@ func dress_route(rng: RandomNumberGenerator) -> void:
 		barrels.art_width = 150.0
 		barrels.position = z0 + Vector2(-96, 40)
 		actors.add_child(barrels)
+		add_prop_footprint(barrels.position, 72.0, 38.0)
 		var last: Dictionary = room.zones[room.zones.size()-1]
 		var cart = SceneProp.new()
 		cart.texture = load("res://content/ruins/war_cart.png")
@@ -253,6 +264,7 @@ func dress_route(rng: RandomNumberGenerator) -> void:
 		cart.mirrored = true
 		cart.position = room.nearest_walkable(Vector2(last.at[0], last.at[1])) + Vector2(120, -30)
 		actors.add_child(cart)
+		add_prop_footprint(cart.position, 104.0, 48.0)
 	# Blood and scorch decals on the ground near where fights happen.
 	var blood := load("res://content/ruins/decal_blood.png")
 	var scorch := load("res://content/ruins/decal_scorch.png")
@@ -298,6 +310,21 @@ func place_brazier(at: Vector2) -> void:
 	body.art_width = 118.0
 	body.position = at
 	actors.add_child(body)
+	add_prop_footprint(at, 36.0, 22.0)
+
+
+func add_prop_footprint(center: Vector2, rx: float, ry: float) -> void:
+	# Ground-plane collision ellipse for a solid prop. Skip near entry/exit so a spawn
+	# lane is never sealed, and skip if the anchor is not on open ground.
+	if center.distance_to(room.entry) < 160.0 or center.distance_to(room.exit_point) < 160.0:
+		return
+	if not room.is_walkable(center, 8.0):
+		return
+	var polygon := PackedVector2Array()
+	for i in 10:
+		var a := TAU * float(i) / 10.0
+		polygon.append(center + Vector2(cos(a) * rx, sin(a) * ry))
+	room.add_prop_blocker(polygon)
 
 func add_scenery(at: Vector2, kind: int, width: float, mirror: bool) -> void:
 	var prop := preload("res://content/ruins/scenery_prop.gd").new()

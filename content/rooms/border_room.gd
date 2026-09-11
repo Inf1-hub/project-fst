@@ -8,6 +8,9 @@ var navigation := AStarGrid2D.new()
 var obstacles: Array[Rect2] = []
 var obstacle_polygons: Array[PackedVector2Array] = []
 var obstacle_bounds: Array[Rect2] = []
+# Decorative solids (braziers, barrels, cart) that block movement but not sight lines.
+var prop_blockers: Array[PackedVector2Array] = []
+var prop_bounds: Array[Rect2] = []
 var outline := PackedVector2Array()
 var entry := Vector2.ZERO
 var exit_point := Vector2.ZERO
@@ -98,6 +101,8 @@ func configure(layout: Dictionary) -> void:
 		safe_points.append(Vector2(id.x * 40 + 20, id.y * 40 + 20))
 	obstacle_polygons.clear()
 	obstacle_bounds.clear()
+	prop_blockers.clear()
+	prop_bounds.clear()
 	for rect in obstacles:
 		var anchor := Vector2(rect.get_center().x,rect.end.y)
 		for item in preload("res://content/ruins/cover_cluster.gd").pieces(rect.size):
@@ -139,9 +144,51 @@ func add_collision(shape: Shape2D, at: Vector2) -> void:
 	add_child(body)
 
 
+func add_prop_blocker(polygon: PackedVector2Array) -> void:
+	# Registers a decorative solid: physics collider + navigation solid so the player
+	# is stopped and enemy pathing routes around it. Kept out of obstacle_polygons so
+	# line-of-sight (and the terrain contract) stay driven purely by cover geometry.
+	if polygon.size() < 3: return
+	prop_blockers.append(polygon)
+	var bounds := Rect2(polygon[0], Vector2.ZERO)
+	for point in polygon: bounds = bounds.expand(point)
+	prop_bounds.append(bounds)
+	var shape := ConvexPolygonShape2D.new()
+	shape.points = polygon
+	add_collision(shape, Vector2.ZERO)
+	var area := bounds.grow(80)
+	for x in range(maxi(0,int(area.position.x/40)),mini(navigation.region.end.x,ceili(area.end.x/40))):
+		for y in range(maxi(0,int(area.position.y/40)),mini(navigation.region.end.y,ceili(area.end.y/40))):
+			navigation.set_point_solid(Vector2i(x,y),not is_walkable(Vector2(x*40+20,y*40+20),48))
+	safe_points.clear()
+	for y in navigation.region.end.y:
+		for x in navigation.region.end.x:
+			if not navigation.is_point_solid(Vector2i(x,y)): safe_points.append(Vector2(x*40+20,y*40+20))
+
+
+func prop_at(at: Vector2, margin: float = 0) -> bool:
+	for index in prop_blockers.size():
+		if not prop_bounds[index].grow(margin).has_point(at): continue
+		var polygon := prop_blockers[index]
+		if Geometry2D.is_point_in_polygon(at,polygon): return true
+		if margin > 0:
+			for i in polygon.size():
+				if Geometry2D.get_closest_point_to_segment(at,polygon[i],polygon[(i+1)%polygon.size()]).distance_to(at) < margin: return true
+	return false
+
+
+func clear_props(from: Vector2, to: Vector2) -> bool:
+	if prop_at(from) or prop_at(to): return false
+	for polygon in prop_blockers:
+		for i in polygon.size():
+			if Geometry2D.segment_intersects_segment(from,to,polygon[i],polygon[(i+1)%polygon.size()]) != null: return false
+	return true
+
+
 func is_walkable(at: Vector2, margin: float = 0) -> bool:
 	if not contains(at): return false
 	if obstacle_at(at,margin): return false
+	if prop_at(at,margin): return false
 	for boundary in boundaries:
 		for index in boundary.size():
 			if Geometry2D.get_closest_point_to_segment(at, boundary[index], boundary[(index + 1) % boundary.size()]).distance_to(at) < margin: return false
@@ -224,6 +271,7 @@ func clear_movement(from: Vector2, to: Vector2) -> bool:
 	if not clear_segment(from, to) or not clear_segment(from + side, to + side) or not clear_segment(from - side, to - side): return false
 	for offset in [Vector2.ZERO,side,-side]:
 		if not clear_obstacles(from+offset,to+offset): return false
+		if not clear_props(from+offset,to+offset): return false
 	return true
 
 

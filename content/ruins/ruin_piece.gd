@@ -18,6 +18,11 @@ func _draw() -> void:
 	var width := extent.x
 	var height := width * .65 + extent.y * .30
 	var bank_height := width / 3.0
+	# Soft contact shadow so the masonry reads as sitting on the ground, not pasted on.
+	draw_set_transform(Vector2(0, -2), 0, Vector2(1.0, 0.34))
+	draw_circle(Vector2.ZERO, width * 0.60, Color(0, 0, 0, 0.16))
+	draw_circle(Vector2.ZERO, width * 0.42, Color(0, 0, 0, 0.24))
+	draw_set_transform(Vector2.ZERO)
 	draw_texture_rect(rubble,Rect2(-width*.53,-bank_height,width*1.06,bank_height),false,tint)
 	if variant == 1:
 		# Fallen core uses a compact section, preserving its natural image aspect.
