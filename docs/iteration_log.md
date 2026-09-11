@@ -7,12 +7,12 @@ ITER-001～ITER-006 于 **2026-09-11 补录**，依据本任务历史、现有�
 ## ITER-012 · 初始化 Git 并推送到 GitHub
 
 - **日期**：2026-09-11
-- **状态**：进行中
+- **状态**：已完成
 - **目标/原因**：将工程推送到空仓库 https://github.com/Inf1-hub/project-fst，并排除不适合上传的非关键大资源。
-- **实际改动**：补全 `.gitignore`：继续忽略 Godot 缓存、本机日志与导出产物；新增忽略可再生成的验证截图、源稿/方向参考大图、常见离线源文件与系统杂项。运行时贴图、脚本、CSV、`.uid` 与 `source_assets` 清单 JSON 仍纳入版本控制。初始化本地 Git 并推送到上述远程。
+- **实际改动**：补全 `.gitignore`：继续忽略 Godot 缓存、本机日志与导出产物；新增忽略可再生成的验证截图、源稿/方向参考大图、常见离线源文件与系统杂项。运行时贴图、脚本、CSV、`.uid` 与 `source_assets` 清单 JSON 仍纳入版本控制。初始化本地 Git，远程为 `origin`，已推送 `main`。
 - **关键文件**：`.gitignore`、`README.md`、`docs/iteration_log.md`
-- **验证结果**：未执行游戏测试（本次只改版本控制与文档）。`git check-ignore` 已确认 `.godot/`、`.local/`、`docs/screenshots/`、`source_assets/art_drafts/` 与 `source_assets/art_direction_a.png` 被忽略；运行时 PNG、`.uid`、CSV 与 `source_assets` JSON 清单已纳入暂存，约 147 个文件 / 30.6 MB。
-- **遗留问题/下一步**：推送完成后把本条状态改为已完成，并记录远程提交结果。
+- **验证结果**：未执行游戏测试（本次只改版本控制与文档）。`git check-ignore` 已确认 `.godot/`、`.local/`、`docs/screenshots/`、`source_assets/art_drafts/` 与 `source_assets/art_direction_a.png` 被忽略；运行时 PNG、`.uid`、CSV 与 `source_assets` JSON 清单已纳入版本控制，约 147 个文件 / 30.6 MB。`git push -u origin main` 成功，`main` 跟踪 `origin/main`。
+- **遗留问题/下一步**：无。验证截图与源稿大图仅保留在本机，克隆仓库后需本地重新截图或自行拷贝。
 
 ## ITER-011 · 弯曲边界与不可通行区环境填充
 
